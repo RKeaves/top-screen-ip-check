@@ -32,6 +32,7 @@ Before using, please be aware that:
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Linux Support](#linux-support)
 - [Configuration & Customization](#configuration--customization)
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
@@ -58,13 +59,13 @@ To install **top-screen-ip-check**:
    - [Tampermonkey](https://www.tampermonkey.net/)
 
 2. **Add the Script:**
-   - Visit the [raw script URL](https://github.com/rkeaves/top-screen-ip-check/raw/main/top-screen-ip-check.js).
+   - Visit the [raw script URL](https://raw.githubusercontent.com/RKeaves/top-screen-ip-check/main/top-screen-ip-check.js).
    - **Copy** all the script code.
    - Open your Tampermonkey dashboard, create a new script, and paste the copied code into the editor.
-   - Save the new script—your installation will now support automatic updates via the defined `@updateURL`.
+   - Save the new script—your installation will now support automatic updates via the defined @updateURL.
 
 3. **Supported Sites:**
-   - The script is configured to run on all websites (`*://*/*`), ensuring that your IP monitor is always active.
+   - The script is configured to run on all websites (*://*/*), ensuring that your IP monitor is always active.
 
 ---
 
@@ -82,6 +83,23 @@ To install **top-screen-ip-check**:
 
 ---
 
+## Linux Support
+
+A dedicated Linux version of **top-screen-ip-check** is now available! This script is designed to run exclusively on Linux systems and provides the same functionality with a platform check.
+
+1. **Installation for Linux Users:**
+   - Download the Linux script from the [raw script URL](https://raw.githubusercontent.com/RKeaves/top-screen-ip-check/main/top-screen-ip-check-linux.js).
+   - **Copy** the entire code.
+   - Open your preferred userscript manager (e.g., Tampermonkey) and create a new script.
+   - Paste the copied code into the editor and save it.
+
+2. **How It Works:**
+   - The Linux version includes a platform check and will only execute on Linux systems.
+   - It fetches your public IP address every 30 seconds using the [ipify](https://www.ipify.org/) API.
+   - On detecting an IP change, it triggers a visual alert and updates the display accordingly.
+
+---
+
 ## Configuration & Customization
 
 - **Check Interval:**  
@@ -89,7 +107,7 @@ To install **top-screen-ip-check**:
   *Tip:* Modify the `checkInterval` variable in the script to adjust the polling frequency.
 
 - **UI Styling:**  
-  The monitor’s appearance is defined via inline CSS added by `GM_addStyle`. You can customize colors, fonts, and layout by editing the style block within the script.
+  The monitor’s appearance is defined via inline CSS added by GM_addStyle. You can customize colors, fonts, and layout by editing the style block within the script.
 
 - **Error Handling:**  
   If the IP fetching fails (e.g., due to connectivity issues), the script logs the error to the console and updates the display with a "Connection error - retrying..." message.

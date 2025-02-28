@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         top-screen-ip-check
 // @namespace    https://github.com/rkeaves
-// @version      1.0
-// @description  Monitors and displays the current IP address at the top of the screen, detecting any changes.
-// @downloadURL  https://github.com/rkeaves/top-screen-ip-check/raw/main/top-screen-ip-check.js
-// @updateURL    https://github.com/rkeaves/top-screen-ip-check/raw/main/top-screen-ip-check.js
+// @version      1.1
+// @description  Monitors and displays the current IP address at the top of the screen, detecting any changes. Works on Windows
+// @downloadURL  https://github.com/rkeaves/top-screen-ip-check-windows/raw/top-screen-ip-check.js
+// @updateURL    https://github.com/rkeaves/top-screen-ip-check-windows/raw/main/top-screen-ip-check.js
 // @author       rkeaves
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
@@ -14,15 +14,25 @@
 (function() {
     'use strict';
 
+    // Configuration: Change the following value to update the IP for leak detection.
+    const IP_LEAK = '111.222.333.444';
+    const OPACITY = 80;
+
+    if (!navigator.platform.toLowerCase().includes('win')) {
+        console.log('This script is exclusive for Windows.');
+        return;
+    }
+
     let currentIP = null;
     let lastIP = null;
-    let checkInterval = 30000; // 30 seconds
+    const checkInterval = 30000; // Default 30 seconds.
 
-    // Create notification container
     const ipContainer = document.createElement('div');
     ipContainer.id = 'ipMonitorContainer';
 
-    // Add styles
+    const alertBox = document.createElement('div');
+    alertBox.id = 'ipAlertBox';
+
     GM_addStyle(`
         #ipMonitorContainer {
             position: fixed;
@@ -35,37 +45,20 @@
             padding: 12px 24px;
             border-radius: 0 0 4px 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             font-size: 14px;
-            transition: background 0.3s ease;
             display: flex;
             align-items: center;
             gap: 15px;
+            opacity: ${OPACITY / 100};
         }
-
         #ipMonitorContainer.changed {
             background: #FF9800 !important;
         }
-
-        .ip-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        #ipMonitorContainer.leak {
+            background: red !important;
         }
-
-        .ip-badge {
-            background: rgba(0,0,0,0.1);
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-
-        .last-check {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        .alert-message {
+        #ipAlertBox {
             position: fixed;
             top: -50px;
             left: 50%;
@@ -78,56 +71,44 @@
             transition: top 0.5s ease;
             z-index: 10000;
         }
-
-        .alert-message.show {
+        #ipAlertBox.show {
             top: 20px;
         }
-
         .close-btn {
             cursor: pointer;
-            margin-left: 15px;
+            margin-left: auto;
+            font-weight: bold;
             opacity: 0.8;
         }
-
         .close-btn:hover {
             opacity: 1;
         }
     `);
 
-    // Create alert element
-    const alertBox = document.createElement('div');
-    alertBox.className = 'alert-message';
-    document.body.appendChild(alertBox);
+    const ipDisplay = document.createElement('div');
+    ipDisplay.id = 'ipDisplay';
+    ipDisplay.innerHTML = '<strong>Current IP:</strong> <span id="ipValue">Fetching...</span>';
+    ipContainer.appendChild(ipDisplay);
 
-    // Create close button
+    const timeDisplay = document.createElement('span');
+    timeDisplay.id = 'lastCheck';
+    timeDisplay.style.fontSize = '0.9em';
+    timeDisplay.style.opacity = '0.8';
+    timeDisplay.textContent = 'Last checked: --:--:--';
+    ipContainer.appendChild(timeDisplay);
+
     const closeBtn = document.createElement('span');
     closeBtn.className = 'close-btn';
-    closeBtn.innerHTML = '×';
+    closeBtn.textContent = '×';
     closeBtn.title = 'Close monitor';
     closeBtn.addEventListener('click', () => {
         ipContainer.remove();
+        alertBox.remove();
     });
-
-    // IP display elements
-    const ipDisplay = document.createElement('div');
-    ipDisplay.className = 'ip-status';
-
-    const ipLabel = document.createElement('span');
-    ipLabel.textContent = 'Current IP:';
-
-    const ipValue = document.createElement('span');
-    ipValue.className = 'ip-badge';
-
-    const timeDisplay = document.createElement('span');
-    timeDisplay.className = 'last-check';
-
-    // Assemble container
-    ipDisplay.appendChild(ipLabel);
-    ipDisplay.appendChild(ipValue);
-    ipContainer.appendChild(ipDisplay);
-    ipContainer.appendChild(timeDisplay);
     ipContainer.appendChild(closeBtn);
+
     document.body.appendChild(ipContainer);
+    document.body.appendChild(alertBox);
 
     function showAlert(message) {
         alertBox.textContent = message;
@@ -142,40 +123,37 @@
             method: 'GET',
             url: 'https://api.ipify.org?format=json',
             onload: function(response) {
-                const data = JSON.parse(response.responseText);
-                currentIP = data.ip;
-
-                ipValue.textContent = currentIP;
-                timeDisplay.textContent = `Last checked: ${new Date().toLocaleTimeString()}`;
-
-                if (lastIP && lastIP !== currentIP) {
-                    ipContainer.classList.add('changed');
-                    showAlert(`IP Address Changed! From ${lastIP} to ${currentIP}`);
-                } else {
-                    ipContainer.classList.remove('changed');
+                try {
+                    const data = JSON.parse(response.responseText);
+                    currentIP = data.ip;
+                    document.getElementById('ipValue').textContent = currentIP;
+                    const now = new Date();
+                    timeDisplay.textContent = 'Last checked: ' + now.toLocaleTimeString();
+                    if (currentIP === IP_LEAK) {
+                        showAlert(`Warning: IP LEAK Detected ! - ${currentIP}`);
+                        ipContainer.classList.add('leak');
+                    } else {
+                        ipContainer.classList.remove('leak');
+                    }
+                    if (lastIP && lastIP !== currentIP) {
+                        ipContainer.classList.add('changed');
+                        showAlert(`IP changed from ${lastIP} to ${currentIP}`);
+                    } else {
+                        ipContainer.classList.remove('changed');
+                    }
+                    lastIP = currentIP;
+                } catch (e) {
+                    console.error('Error parsing IP response:', e);
+                    document.getElementById('ipValue').textContent = 'Error - retrying...';
                 }
-
-                lastIP = currentIP;
             },
-            onerror: function(error) {
-                console.error('IP check failed:', error);
-                timeDisplay.textContent = 'Connection error - retrying...';
+            onerror: function(err) {
+                console.error('Error fetching IP:', err);
+                document.getElementById('ipValue').textContent = 'Connection error - retrying...';
             }
         });
     }
 
-    // Initial update
     updateIP();
-
-    // Set up periodic checking
     setInterval(updateIP, checkInterval);
-
-    // Add hover effect
-    ipContainer.addEventListener('mouseenter', () => {
-        ipContainer.style.opacity = '0.9';
-    });
-
-    ipContainer.addEventListener('mouseleave', () => {
-        ipContainer.style.opacity = '1';
-    });
 })();

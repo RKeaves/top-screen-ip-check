@@ -1,6 +1,6 @@
 # top-screen-ip-check
 
-[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/rkeaves/top-screen-ip-check)
+[![Version](https://img.shields.io/badge/version-1.1-blue.svg)](https://github.com/rkeaves/top-screen-ip-check)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 ---
@@ -25,14 +25,25 @@ Before using, please be aware that:
 
 ---
 
+## Changelog
+
+### Version 1.1
+
+- Updated the script version to 1.1 with enhanced IP monitoring features
+- Introduced a configurable opacity setting for the IP display
+- Improved the visual alert mechanism for detecting IP changes and leak detection
+- Added a platform check to ensure the script runs exclusively on Windows
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
 - [Warning](#warning)
+- [Changelog](#changelog)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Linux Support](#linux-support)
 - [Configuration & Customization](#configuration--customization)
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
@@ -45,9 +56,9 @@ Before using, please be aware that:
 - **Real-time IP Monitoring:** Continuously fetches and displays your public IP address.
 - **IP Change Detection:** Highlights the monitor and displays an alert when your IP address changes.
 - **Timestamped Updates:** Shows the exact time of the last successful IP check.
-- **Customizable UI:** A floating, responsive UI positioned at the top center of your screen.
+- **Customizable UI:** A floating, responsive UI positioned at the top center of your screen with a configurable opacity.
 - **Dismissible Display:** Easily remove the monitor using the integrated close button.
-- **Lightweight & Efficient:** Uses Tampermonkey/Greasemonkey APIs (GM_xmlhttpRequest and GM_addStyle) for seamless integration and performance.
+- **Enhanced Alerts:** Provides visual alerts for both IP changes and potential IP leaks.
 
 ---
 
@@ -76,27 +87,11 @@ To install **top-screen-ip-check**:
    - It displays your current public IP along with the time of the last check.
 
 2. **Change Alerts:**
-   - When a change in your IP is detected, the background color of the monitor shifts (from green to orange), and a temporary alert appears with details of the change.
+   - When a change in your IP is detected, the background color of the monitor shifts (from green to orange) and a temporary alert appears with details of the change.
+   - If your current IP matches a pre-configured IP (for leak detection), an alert is shown and the monitor background turns red.
 
 3. **Dismissal:**
    - If you no longer need the monitor, click the close button (×) to remove it from the screen.
-
----
-
-## Linux Support
-
-A dedicated Linux version of **top-screen-ip-check** is now available! This script is designed to run exclusively on Linux systems and provides the same functionality with a platform check.
-
-1. **Installation for Linux Users:**
-   - Download the Linux script from the [raw script URL](https://raw.githubusercontent.com/RKeaves/top-screen-ip-check/main/top-screen-ip-check-linux.js).
-   - **Copy** the entire code.
-   - Open your preferred userscript manager (e.g., Tampermonkey) and create a new script.
-   - Paste the copied code into the editor and save it.
-
-2. **How It Works:**
-   - The Linux version includes a platform check and will only execute on Linux systems.
-   - It fetches your public IP address every 30 seconds using the [ipify](https://www.ipify.org/) API.
-   - On detecting an IP change, it triggers a visual alert and updates the display accordingly.
 
 ---
 
@@ -107,7 +102,7 @@ A dedicated Linux version of **top-screen-ip-check** is now available! This scri
   *Tip:* Modify the `checkInterval` variable in the script to adjust the polling frequency.
 
 - **UI Styling:**  
-  The monitor’s appearance is defined via inline CSS added by GM_addStyle. You can customize colors, fonts, and layout by editing the style block within the script.
+  The monitor’s appearance is defined via inline CSS added by GM_addStyle. You can customize colors, fonts, layout, and opacity by editing the style block within the script.
 
 - **Error Handling:**  
   If the IP fetching fails (e.g., due to connectivity issues), the script logs the error to the console and updates the display with a "Connection error - retrying..." message.
@@ -143,5 +138,3 @@ For major changes, please open an issue first to discuss your plans.
 ## License
 
 This project is licensed under the [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
-
----

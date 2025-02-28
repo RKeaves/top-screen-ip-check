@@ -3,6 +3,8 @@
 [![Version](https://img.shields.io/badge/version-1.1-blue.svg)](https://github.com/rkeaves/top-screen-ip-check)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
+![IP Leak](https://i.ibb.co/Xr0Fdbnh/ipleak.gif)
+
 ---
 
 ## Overview

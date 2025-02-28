@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         top-screen-ip-check-linux
 // @namespace    https://github.com/rkeaves
-// @version      1.0
+// @version      1.1
 // @description  Monitors and displays the current IP address at the top of the screen, detecting any changes. Works on Linux
 // @downloadURL  https://github.com/rkeaves/top-screen-ip-check-linux/raw/top-screen-ip-check-linux.js
 // @updateURL    https://github.com/rkeaves/top-screen-ip-check-linux/raw/main/top-screen-ip-check-linux.js
@@ -13,6 +13,10 @@
 
 (function() {
     'use strict';
+
+    // Configuration: Change the following value to update the IP for leak detection.
+    const IP_LEAK = '111.222.333.444';
+    const OPACITY = 80; // Set opacity in percentage (e.g., 80 for 80%)
 
     // Only run this script on Linux
     if (!navigator.platform.toLowerCase().includes('linux')) {
@@ -50,9 +54,13 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            opacity: ${OPACITY / 100};
         }
         #ipMonitorContainer.changed {
             background: #FF9800 !important;
+        }
+        #ipMonitorContainer.leak {
+            background: red !important;
         }
         #ipAlertBox {
             position: fixed;
@@ -129,9 +137,14 @@
                     const data = JSON.parse(response.responseText);
                     currentIP = data.ip;
                     document.getElementById('ipValue').textContent = currentIP;
-                    // Update last checked time
                     const now = new Date();
                     timeDisplay.textContent = 'Last checked: ' + now.toLocaleTimeString();
+                    if (currentIP === IP_LEAK) {
+                        showAlert(`Warning: IP LEAK Detected ! - ${currentIP}`);
+                        ipContainer.classList.add('leak');
+                    } else {
+                        ipContainer.classList.remove('leak');
+                    }
                     if (lastIP && lastIP !== currentIP) {
                         ipContainer.classList.add('changed');
                         showAlert(`IP changed from ${lastIP} to ${currentIP}`);
